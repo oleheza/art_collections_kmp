@@ -6,3 +6,8 @@ Kotlin Multiplatform Project
 * Android
 
 # Tech stack
+
+* Jetpack Compose
+* Jetpack ViewModel
+* ktor
+* Koin

@@ -1,11 +1,18 @@
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.ksp)
+}
+
+ksp {
+    arg("KOIN_CONFIG_CHECK", "true")
+    arg("KOIN_USE_COMPOSE_VIEWMODEL", "true")
 }
 
 kotlin {
@@ -15,7 +22,7 @@ kotlin {
             jvmTarget.set(JvmTarget.JVM_11)
         }
     }
-    
+
     listOf(
         iosX64(),
         iosArm64(),
@@ -26,12 +33,13 @@ kotlin {
             isStatic = true
         }
     }
-    
+
     sourceSets {
-        
+
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
+            implementation(libs.koin.android)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -42,6 +50,9 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtime.compose)
+
+            implementation(libs.koin)
+            api(libs.koin.annotations)
         }
     }
 }
@@ -79,7 +90,20 @@ android {
         compose = true
     }
     dependencies {
+        add("kspCommonMainMetadata", libs.koin.ksp.compiler)
         debugImplementation(compose.uiTooling)
     }
 }
 
+tasks.withType<KotlinCompile<*>>().configureEach {
+    if (name != "kspCommonMainKotlinMetadata") {
+        dependsOn("kspCommonMainKotlinMetadata")
+    }
+}
+afterEvaluate {
+    tasks.filter {
+        it.name.contains("SourcesJar", true)
+    }.forEach {
+        it.dependsOn("kspCommonMainKotlinMetadata")
+    }
+}
