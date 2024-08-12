@@ -3,6 +3,7 @@ package ua.oldev.artscollection.core.data.network
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import org.koin.core.annotation.Single
+import ua.oldev.artscollection.core.data.dto.ArtObjectDTO
 
 @Single
 class ApiClient(
@@ -12,7 +13,7 @@ class ApiClient(
         httpClientFactory.createHttpClient(true)
     }
 
-    suspend fun getAllArtObjects() {
+    suspend fun getAllArtObjects(): List<ArtObjectDTO> {
         return httpClient.get(BASE_URL).body()
     }
 

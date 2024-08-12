@@ -11,3 +11,4 @@ Kotlin Multiplatform Project
 * Jetpack ViewModel
 * ktor
 * Koin
+* Jetpack Navigation
