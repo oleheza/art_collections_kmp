@@ -15,6 +15,8 @@ fun AppNavigation(
         navHostController = navHostController,
         startDestination = startDestination
     ) {
+        composable(CollectionsList) {
 
+        }
     }
 }

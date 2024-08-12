@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.serialization)
 }
 
 ksp {
@@ -40,6 +41,7 @@ kotlin {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
             implementation(libs.koin.android)
+            implementation(libs.ktor.client.okhttp)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -55,7 +57,21 @@ kotlin {
             api(libs.koin.annotations)
 
             implementation(libs.navigation.compose)
+
+            with(libs.ktor.client) {
+                implementation(core)
+                implementation(content.negotiation)
+                implementation(serialization.kotlinx)
+                implementation(logging)
+            }
         }
+        iosMain.dependencies {
+            implementation(libs.ktor.client.darwin)
+        }
+    }
+
+    sourceSets.named("commonMain").configure {
+        kotlin.srcDir("build/generated/ksp/metadata/commonMain/kotlin")
     }
 }
 
@@ -92,9 +108,12 @@ android {
         compose = true
     }
     dependencies {
-        add("kspCommonMainMetadata", libs.koin.ksp.compiler)
         debugImplementation(compose.uiTooling)
     }
+}
+
+dependencies {
+    add("kspCommonMainMetadata", libs.koin.ksp.compiler)
 }
 
 tasks.withType<KotlinCompile<*>>().configureEach {
